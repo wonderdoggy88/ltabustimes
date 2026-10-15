@@ -53,7 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div>
               <div className="flex items-center gap-1.5">
                 <h1 className="text-base sm:text-lg font-black tracking-tight text-white">
-                  SG Bus <span className="text-emerald-400">Arrival</span>
+                  Der Shings <span className="text-emerald-400">Bus Arrivals</span>
                 </h1>
                 <span className="hidden sm:inline-block text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-950/90 text-emerald-300 border border-emerald-700/60 font-mono">
                   LTA Live
