@@ -7,7 +7,6 @@ import { Star, Search, Plus, BookmarkCheck, ArrowRight, Sparkles } from 'lucide-
 interface FavoritesViewProps {
   favorites: FavoriteStop[];
   onToggleFavorite: (stopCode: string, nickname?: string) => void;
-  onSelectOnMap: (stop: BusStop, serviceNo?: string) => void;
   onViewRoute?: (serviceNo: string) => void;
   userApiKey?: string;
   refreshTrigger?: number;
@@ -16,7 +15,6 @@ interface FavoritesViewProps {
 export const FavoritesView: React.FC<FavoritesViewProps> = ({
   favorites,
   onToggleFavorite,
-  onSelectOnMap,
   onViewRoute,
   userApiKey,
   refreshTrigger,
@@ -133,7 +131,6 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
               isFavorite={true}
               nickname={nickname}
               onToggleFavorite={onToggleFavorite}
-              onSelectOnMap={onSelectOnMap}
               onViewRoute={onViewRoute}
               userApiKey={userApiKey}
               refreshTrigger={refreshTrigger}

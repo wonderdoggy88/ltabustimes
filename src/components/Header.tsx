@@ -4,13 +4,12 @@ import {
   Search,
   Star,
   Navigation,
-  Map as MapIcon,
   Settings,
   RefreshCw,
   Clock,
 } from 'lucide-react';
 
-export type AppTab = 'search' | 'favorites' | 'near-me' | 'live-map';
+export type AppTab = 'search' | 'favorites' | 'near-me';
 
 interface HeaderProps {
   currentTab: AppTab;
@@ -151,19 +150,6 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Navigation className="w-3.5 h-3.5" />
             <span>Near Me (GPS)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onTabChange('live-map')}
-            className={`px-3.5 py-2 rounded-xl font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
-              currentTab === 'live-map'
-                ? 'bg-teal-400 text-slate-950 shadow-md shadow-teal-400/20'
-                : 'bg-slate-800/60 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-            }`}
-          >
-            <MapIcon className="w-3.5 h-3.5" />
-            <span>Live SG Map</span>
           </button>
         </div>
       </div>

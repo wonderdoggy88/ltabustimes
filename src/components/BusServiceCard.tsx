@@ -6,7 +6,6 @@ import { Navigation, Bell, Route, Compass } from 'lucide-react';
 interface BusServiceCardProps {
   arrival: BusServiceArrival;
   stopCode: string;
-  onTrackOnMap?: (serviceNo: string) => void;
   onViewRoute?: (serviceNo: string) => void;
   isAlertSet?: boolean;
   onToggleAlert?: (serviceNo: string) => void;
@@ -21,7 +20,6 @@ const OPERATOR_COLORS: Record<BusOperator, { bg: string; text: string; border: s
 
 export const BusServiceCard: React.FC<BusServiceCardProps> = ({
   arrival,
-  onTrackOnMap,
   onViewRoute,
   isAlertSet = false,
   onToggleAlert,
@@ -157,19 +155,7 @@ export const BusServiceCard: React.FC<BusServiceCardProps> = ({
             title="View bus stop sequence route"
           >
             <Route className="w-3.5 h-3.5" />
-            <span>Route</span>
-          </button>
-        )}
-
-        {onTrackOnMap && (
-          <button
-            type="button"
-            onClick={() => onTrackOnMap(ServiceNo)}
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-800/50 px-2.5 py-1 rounded-md transition-colors"
-            title="Track live moving bus on Singapore map"
-          >
-            <Compass className="w-3.5 h-3.5 animate-spin-slow" />
-            <span>Live GPS</span>
+            <span>Route Sequence</span>
           </button>
         )}
       </div>

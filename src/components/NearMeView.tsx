@@ -10,7 +10,6 @@ interface NearMeViewProps {
   setUserLocation: (loc: { lat: number; lng: number } | null) => void;
   favorites: string[];
   onToggleFavorite: (stopCode: string, nickname?: string) => void;
-  onSelectOnMap: (stop: BusStop, serviceNo?: string) => void;
   onViewRoute?: (serviceNo: string) => void;
   userApiKey?: string;
   refreshTrigger?: number;
@@ -21,7 +20,6 @@ export const NearMeView: React.FC<NearMeViewProps> = ({
   setUserLocation,
   favorites,
   onToggleFavorite,
-  onSelectOnMap,
   onViewRoute,
   userApiKey,
   refreshTrigger,
@@ -149,7 +147,6 @@ export const NearMeView: React.FC<NearMeViewProps> = ({
               stop={stop}
               isFavorite={isFav}
               onToggleFavorite={onToggleFavorite}
-              onSelectOnMap={onSelectOnMap}
               onViewRoute={onViewRoute}
               userApiKey={userApiKey}
               refreshTrigger={refreshTrigger}

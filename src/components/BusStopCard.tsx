@@ -20,7 +20,6 @@ interface BusStopCardProps {
   isFavorite: boolean;
   nickname?: string;
   onToggleFavorite: (stopCode: string, nickname?: string) => void;
-  onSelectOnMap: (stop: BusStop, serviceNo?: string) => void;
   onViewRoute?: (serviceNo: string) => void;
   userApiKey?: string;
   refreshTrigger?: number; // increments when global refresh fires
@@ -31,7 +30,6 @@ export const BusStopCard: React.FC<BusStopCardProps> = ({
   isFavorite,
   nickname,
   onToggleFavorite,
-  onSelectOnMap,
   onViewRoute,
   userApiKey,
   refreshTrigger = 0,
@@ -160,16 +158,6 @@ export const BusStopCard: React.FC<BusStopCardProps> = ({
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-1.5 shrink-0">
-            {/* View on Map */}
-            <button
-              type="button"
-              onClick={() => onSelectOnMap(stop)}
-              className="p-2 rounded-lg bg-slate-800 hover:bg-emerald-950 text-slate-300 hover:text-emerald-300 border border-slate-700 hover:border-emerald-700/60 transition-colors"
-              title="View on Interactive Live Map"
-            >
-              <MapPin className="w-4 h-4" />
-            </button>
-
             {/* Manual Refresh */}
             <button
               type="button"
@@ -307,7 +295,6 @@ export const BusStopCard: React.FC<BusStopCardProps> = ({
                   key={arr.ServiceNo}
                   arrival={arr}
                   stopCode={stop.BusStopCode}
-                  onTrackOnMap={(svc) => onSelectOnMap(stop, svc)}
                   onViewRoute={onViewRoute}
                   isAlertSet={alertServices.has(arr.ServiceNo)}
                   onToggleAlert={handleToggleAlert}
@@ -321,14 +308,9 @@ export const BusStopCard: React.FC<BusStopCardProps> = ({
             <span>
               Updated at {lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </span>
-            <button
-              type="button"
-              onClick={() => onSelectOnMap(stop)}
-              className="text-emerald-400 hover:text-emerald-300 font-medium inline-flex items-center gap-1"
-            >
-              <span>Track all arriving buses on map</span>
-              <MapPin className="w-3 h-3" />
-            </button>
+            <span className="text-slate-500">
+              Auto-updating via LTA live timings
+            </span>
           </div>
         </div>
       )}

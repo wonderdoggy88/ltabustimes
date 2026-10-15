@@ -5,7 +5,6 @@ import { Header, AppTab } from './components/Header';
 import { BusStopCard } from './components/BusStopCard';
 import { FavoritesView } from './components/FavoritesView';
 import { NearMeView } from './components/NearMeView';
-import { LiveBusMap } from './components/LiveBusMap';
 import { BusRouteModal } from './components/BusRouteModal';
 import { SettingsModal } from './components/SettingsModal';
 import {
@@ -76,9 +75,6 @@ export default function App() {
   // Modals & Active Selections
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [activeRouteService, setActiveRouteService] = useState<string | null>(null);
-  const [selectedStopForMap, setSelectedStopForMap] = useState<BusStop>(SINGAPORE_BUS_STOPS[0]);
-  const [selectedServiceForMap, setSelectedServiceForMap] = useState<string | undefined>(undefined);
-  const [showEmbeddedMap, setShowEmbeddedMap] = useState<boolean>(false);
 
   // Geolocation
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -166,16 +162,6 @@ export default function App() {
     [favorites]
   );
 
-  // Map interaction handler
-  const handleSelectOnMap = (stop: BusStop, serviceNo?: string) => {
-    setSelectedStopForMap(stop);
-    setSelectedServiceForMap(serviceNo);
-    // Switch to map or open embedded map
-    if (currentTab !== 'live-map') {
-      setShowEmbeddedMap(true);
-    }
-  };
-
   // Filter bus stops for the search tab
   const filteredStops = useMemo(() => {
     let result = SINGAPORE_BUS_STOPS;
@@ -207,7 +193,6 @@ export default function App() {
         currentTab={currentTab}
         onTabChange={(tab) => {
           setCurrentTab(tab);
-          setShowEmbeddedMap(false);
         }}
         favoritesCount={favorites.length}
         onOpenSettings={() => setIsSettingsOpen(true)}
@@ -218,19 +203,6 @@ export default function App() {
 
       {/* Main App Body */}
       <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 space-y-6">
-        {/* Floating / Embedded Live Map Drawer if triggered from a card */}
-        {showEmbeddedMap && (
-          <div className="relative">
-            <LiveBusMap
-              selectedStop={selectedStopForMap}
-              selectedServiceNo={selectedServiceForMap}
-              userLocation={userLocation}
-              onSelectStop={(s) => setSelectedStopForMap(s)}
-              onClose={() => setShowEmbeddedMap(false)}
-              userApiKey={apiKey}
-            />
-          </div>
-        )}
 
         {/* 1. SEARCH & ALL STOPS TAB */}
         {currentTab === 'search' && (
@@ -362,7 +334,6 @@ export default function App() {
                       isFavorite={isFav}
                       nickname={favItem?.nickname}
                       onToggleFavorite={handleToggleFavorite}
-                      onSelectOnMap={handleSelectOnMap}
                       onViewRoute={(svc) => setActiveRouteService(svc)}
                       userApiKey={apiKey}
                       refreshTrigger={refreshTrigger}
@@ -379,7 +350,6 @@ export default function App() {
           <FavoritesView
             favorites={favorites}
             onToggleFavorite={handleToggleFavorite}
-            onSelectOnMap={handleSelectOnMap}
             onViewRoute={(svc) => setActiveRouteService(svc)}
             userApiKey={apiKey}
             refreshTrigger={refreshTrigger}
@@ -393,33 +363,10 @@ export default function App() {
             setUserLocation={setUserLocation}
             favorites={favoriteStopCodes}
             onToggleFavorite={handleToggleFavorite}
-            onSelectOnMap={handleSelectOnMap}
             onViewRoute={(svc) => setActiveRouteService(svc)}
             userApiKey={apiKey}
             refreshTrigger={refreshTrigger}
           />
-        )}
-
-        {/* 4. FULL INTERACTIVE SINGAPORE LIVE MAP TAB */}
-        {currentTab === 'live-map' && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-slate-400">
-              <span className="font-semibold text-white flex items-center gap-1.5">
-                <Compass className="w-4 h-4 text-emerald-400" />
-                <span>Live Singapore Bus & Route Tracker Map</span>
-              </span>
-              <span>Tap any bus or bus stop pin for live details</span>
-            </div>
-            <div className="h-[650px] w-full">
-              <LiveBusMap
-                selectedStop={selectedStopForMap}
-                selectedServiceNo={selectedServiceForMap}
-                userLocation={userLocation}
-                onSelectStop={(s) => setSelectedStopForMap(s)}
-                userApiKey={apiKey}
-              />
-            </div>
-          </div>
         )}
       </main>
 
@@ -429,7 +376,6 @@ export default function App() {
           serviceNo={activeRouteService}
           onClose={() => setActiveRouteService(null)}
           onSelectStop={(stop) => {
-            setSelectedStopForMap(stop);
             setCurrentTab('search');
             setSearchQuery(stop.BusStopCode);
           }}
@@ -455,9 +401,9 @@ export default function App() {
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© SG Bus Arrival • Powered by Singapore Land Transport Authority (LTA) DataMall standards</p>
+          <p>© Der Shings Bus Arrivals • Powered by Singapore Land Transport Authority (LTA) DataMall standards</p>
           <div className="flex items-center gap-4 text-[11px]">
-            <span className="text-emerald-400 font-mono">Live Bus Locations</span>
+            <span className="text-emerald-400 font-mono">Live LTA Bus Headways</span>
             <span>•</span>
             <span className="text-slate-400">Seats / Standing / Crowded Load Tracking</span>
             <span>•</span>
