@@ -40,34 +40,36 @@ export function getOperatorForService(serviceNo: string): BusOperator {
 
 /**
  * Generate real-time bus arrivals for a stop code.
- * Clock-synchronized so that ETAs decrease second-by-second realistically.
+ * Connects to our backend /api/lta/bus-arrival endpoint which proxies to LTA DataMall v2.
+ * Falls back seamlessly to clock-synchronized real-time engine when needed.
  */
 export async function fetchBusArrivals(
   busStopCode: string,
   userApiKey?: string
 ): Promise<{ arrivals: BusServiceArrival[]; source: 'lta-api' | 'live-engine' }> {
-  // If user provided a custom LTA API key, attempt direct fetch with fallback
-  if (userApiKey && userApiKey.trim().length > 10) {
-    try {
-      const response = await fetch(
-        `https://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${busStopCode}`,
-        {
-          headers: {
-            AccountKey: userApiKey.trim(),
-            accept: 'application/json',
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        if (data && Array.isArray(data.Services)) {
-          const mapped = data.Services.map((s: any) => formatLtaService(s, busStopCode));
-          return { arrivals: mapped, source: 'lta-api' };
-        }
-      }
-    } catch {
-      // CORS or network failure: gracefully fall through to live-engine
+  try {
+    const headers: Record<string, string> = {
+      accept: 'application/json',
+    };
+    if (userApiKey && userApiKey.trim().length > 5) {
+      headers['AccountKey'] = userApiKey.trim();
+      headers['x-account-key'] = userApiKey.trim();
     }
+
+    const response = await fetch(
+      `/api/busarrival?BusStopCode=${encodeURIComponent(busStopCode)}`,
+      { headers }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data && Array.isArray(data.Services) && data.Services.length > 0) {
+        const mapped = data.Services.map((s: any) => formatLtaService(s, busStopCode));
+        return { arrivals: mapped, source: 'lta-api' };
+      }
+    }
+  } catch {
+    // network or backend failure: gracefully fall through to live simulation engine
   }
 
   // Find stop metadata
@@ -262,4 +264,53 @@ export function getActiveBusesForStop(
         distanceKm: distKm,
       };
     });
+}
+
+/**
+ * Health check & status from backend serverless connection
+ */
+export async function checkLtaServerHealth(): Promise<{
+  status: string;
+  hasServerApiKey: boolean;
+  mode: string;
+}> {
+  try {
+    const res = await fetch('/api/health');
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // offline or static mode
+  }
+  return { status: 'offline', hasServerApiKey: false, mode: 'local' };
+}
+
+/**
+ * Fetch raw bus stops from LTA DataMall v2
+ */
+export async function fetchLtaBusStops(skip: number = 0, apiKey?: string) {
+  const headers: Record<string, string> = { accept: 'application/json' };
+  if (apiKey) headers['x-account-key'] = apiKey;
+  const res = await fetch(`/api/lta/bus-stops?skip=${skip}`, { headers });
+  return res.json();
+}
+
+/**
+ * Fetch raw bus routes from LTA DataMall v2
+ */
+export async function fetchLtaBusRoutes(skip: number = 0, apiKey?: string) {
+  const headers: Record<string, string> = { accept: 'application/json' };
+  if (apiKey) headers['x-account-key'] = apiKey;
+  const res = await fetch(`/api/lta/bus-routes?skip=${skip}`, { headers });
+  return res.json();
+}
+
+/**
+ * Fetch raw bus services from LTA DataMall v2
+ */
+export async function fetchLtaBusServices(skip: number = 0, apiKey?: string) {
+  const headers: Record<string, string> = { accept: 'application/json' };
+  if (apiKey) headers['x-account-key'] = apiKey;
+  const res = await fetch(`/api/lta/bus-services?skip=${skip}`, { headers });
+  return res.json();
 }
